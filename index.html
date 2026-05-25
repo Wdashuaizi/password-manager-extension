@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>账号密码管理器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 380px;
+            min-height: 500px;
+            max-height: 600px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 460px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            margin-bottom: 16px;
+        }
+
+        .card:last-child {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a4a6a;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e8e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1a1a2e;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: #b0b0c8;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        .account-list {
+            list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: #b0b0c8;
+        }
+
+        .empty-state .icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 12px;
+        }
+
+        .account-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f8fc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .account-item:hover {
+            background: #f0f0f8;
+            transform: translateX(3px);
+        }
+
+        .account-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .account-url {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .account-username {
+            font-size: 12px;
+            color: #6a6a8a;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .account-date {
+            font-size: 11px;
+            color: #a0a0b8;
+            margin-left: auto;
+        }
+
+        .btn-copy {
+            padding: 6px 10px;
+            background: #fff;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .btn-copy:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .btn-copy.copied {
+            background: #10b981;
+            border-color: #10b981;
+            color: #fff;
+        }
+
+        .btn-delete {
+            padding: 6px 8px;
+            background: #fff;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin-left: 6px;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .toast {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #10b981;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f8;
+        }
+
+        .stats-text {
+            font-size: 13px;
+            color: #6a6a8a;
+        }
+
+        .stats-count {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .btn-clear {
+            padding: 5px 10px;
+            background: #fff;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 6px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .account-notes {
+            font-size: 11px;
+            color: #8888a8;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .account-notes-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-edit-notes {
+            padding: 2px 6px;
+            background: none;
+            border: 1px solid #c8c8e0;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            color: #6a6a8a;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-edit-notes:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 900;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 320px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px 12px;
+            border: 2px solid #e8e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #1a1a2e;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-textarea:focus {
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-modal-cancel {
+            padding: 8px 16px;
+            background: #fff;
+            color: #6a6a8a;
+            border: 1px solid #d0d0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #f5f5f8;
+        }
+
+        .btn-modal-save {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-save:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .lock-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 460px;
+        }
+
+        .lock-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 32px 28px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .lock-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .lock-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .lock-desc {
+            font-size: 13px;
+            color: #6a6a8a;
+            margin-bottom: 20px;
+        }
+
+        .lock-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e8e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #1a1a2e;
+            outline: none;
+            transition: border-color 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .lock-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+        }
+
+        .btn-unlock:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .lock-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .lock-warning {
+            font-size: 11px;
+            color: #b8860b;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .account-password {
+            font-size: 12px;
+            color: #6a6a8a;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .password-text {
+            font-family: 'Consolas', 'Courier New', monospace;
+            letter-spacing: 1px;
+            color: #8888a8;
+        }
+
+        .btn-toggle-pwd {
+            padding: 1px 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-toggle-pwd:hover {
+            opacity: 1;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e8e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            transition: border-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .modal-input:focus {
+            border-color: #667eea;
+        }
+
+        .modal-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-header {
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-header:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-card">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title" id="lockTitle">设置主密码</h2>
+            <p class="lock-desc" id="lockDesc">首次使用，请设置主密码来保护您的数据</p>
+            <input type="password" class="lock-input" id="masterPasswordInput" placeholder="输入主密码" autocomplete="off">
+            <input type="password" class="lock-input" id="masterPasswordConfirm" placeholder="确认主密码" autocomplete="off">
+            <button class="btn-unlock" id="btnUnlock">设置主密码</button>
+            <p class="lock-error" id="lockError"></p>
+            <p class="lock-warning">⚠️ 主密码无法找回，忘记则数据永久丢失<br>请设置足够复杂的密码</p>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display:none;">
+        <div class="header">
+            <h1>🔐 账号密码管理器</h1>
+            <p>数据仅保存在本地浏览器中</p>
+            <div class="header-actions">
+                <button class="btn-header" id="btnChangePwd">🔑 修改主密码</button>
+                <button class="btn-header" id="btnLock">🔒 锁定</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">添加新账号</h2>
+            <form id="accountForm">
+                <div class="form-group">
+                    <label for="url">网址</label>
+                    <input type="text" id="url" placeholder="如：https://example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" placeholder="请输入账号或邮箱" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn-save">保存账号</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">已保存的账号</h2>
+            <div class="stats" id="stats" style="display: none;">
+                <span class="stats-text">共 <span class="stats-count" id="accountCount">0</span> 个账号</span>
+                <button class="btn-clear" id="btnClearAll">清空全部</button>
+            </div>
+            <ul class="account-list" id="accountList">
+                <li class="empty-state" id="emptyState">
+                    <div class="icon">📭</div>
+                    <p>还没有保存任何账号</p>
+                    <p>在上方表单中添加您的第一个账号吧</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="changePwdModal">
+        <div class="modal-box">
+            <div class="modal-title">🔑 修改主密码</div>
+            <input type="password" class="modal-input" id="oldPwdInput" placeholder="当前主密码" autocomplete="off">
+            <input type="password" class="modal-input" id="newPwdInput" placeholder="新主密码" autocomplete="off">
+            <input type="password" class="modal-input" id="newPwdConfirm" placeholder="确认新主密码" autocomplete="off">
+            <p class="modal-error" id="changePwdError"></p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="btnChangePwdCancel">取消</button>
+                <button class="btn-modal-save" id="btnChangePwdSave">确认修改</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="notesModal">
+        <div class="modal-box">
+            <div class="modal-title">📝 编辑备注</div>
+            <textarea class="modal-textarea" id="notesTextarea" placeholder="为这条记录添加备注..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="btnModalCancel">取消</button>
+                <button class="btn-modal-save" id="btnModalSave">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

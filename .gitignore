@@ -1,0 +1,16 @@
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+.trae/
+
+# 依赖（如果你以后用 npm）
+node_modules/
+
+# 打包文件（如果不必要）
+*.zip
+*.crx
+*.pem
